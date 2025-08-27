@@ -89,26 +89,61 @@ st.markdown("""
         display: flex;
         justify-content: center;
         margin: 2rem 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #0f3460 0%, #533483 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .game-board {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        background: #1a1a2e;
+        padding: 8px;
+        border-radius: 15px;
+        width: 100%;
     }
     
     .stButton > button {
-        width: 100px !important;
-        height: 100px !important;
-        font-size: 3rem !important;
-        border-radius: 15px !important;
-        border: 3px solid #533483 !important;
+        width: 120px !important;
+        height: 120px !important;
+        font-size: 4rem !important;
+        border-radius: 8px !important;
+        border: none !important;
         background: linear-gradient(135deg, #16213e 0%, #0f3460 100%) !important;
-        transition: all 0.3s ease !important;
-        margin: 2px !important;
+        color: white !important;
+        transition: all 0.2s ease !important;
+        margin: 0 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
     }
     
     .stButton > button:hover {
         transform: scale(1.05) !important;
-        box-shadow: 0 8px 25px rgba(83, 52, 131, 0.4) !important;
+        background: linear-gradient(135deg, #533483 0%, #0f3460 100%) !important;
+        box-shadow: 0 8px 25px rgba(83, 52, 131, 0.6) !important;
     }
     
     .stButton > button:active {
         transform: scale(0.95) !important;
+    }
+    
+    .stButton > button:disabled {
+        opacity: 1 !important;
+        cursor: default !important;
+    }
+    
+    .winning-cell {
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%) !important;
+        animation: glow 1.5s ease-in-out infinite alternate !important;
+    }
+    
+    @keyframes glow {
+        from { box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4) !important; }
+        to { box-shadow: 0 8px 30px rgba(39, 174, 96, 0.8) !important; }
     }
     
     .control-buttons {
@@ -289,12 +324,13 @@ else:
     st.markdown(f'<div class="game-status"><span class="{player_color}">🎯 Player {st.session_state.current_player}\'s Turn</span></div>', unsafe_allow_html=True)
 
 # Game board
-st.markdown('<div class="board-container">', unsafe_allow_html=True)
+st.markdown('<div class="board-container"><div class="game-board">', unsafe_allow_html=True)
 
+# Create a 3x3 grid using columns
+board_cols = st.columns(3)
 for i in range(3):
-    cols = st.columns(3)
     for j in range(3):
-        with cols[j]:
+        with board_cols[j]:
             cell_content = st.session_state.board[i][j]
             
             # Determine button display
@@ -308,14 +344,16 @@ for i in range(3):
             # Check if this cell is part of winning line
             is_winning_cell = (i, j) in st.session_state.winning_line
             
-            # Create button
-            if st.button(display_text, key=f"cell_{i}_{j}", 
+            # Create button with winning cell styling
+            button_key = f"cell_{i}_{j}"
+            if st.button(display_text, key=button_key, 
                         disabled=st.session_state.game_over or cell_content != '',
-                        help=f"Row {i+1}, Column {j+1}"):
+                        help=f"Row {i+1}, Column {j+1}",
+                        use_container_width=True):
                 make_move(i, j)
                 st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div></div>', unsafe_allow_html=True)
 
 # Control buttons
 st.markdown('<div class="control-buttons">', unsafe_allow_html=True)
@@ -358,6 +396,11 @@ with st.expander("📖 How to Play"):
 # Footer
 st.markdown("---")
 st.markdown(
-    '<p style="text-align: center; color: #888; font-size: 0.9rem;">🎮 Built with Streamlit • Enjoy your game!</p>', 
+    '<p style="text-align: center; color: #f39c12; font-size: 1rem; font-weight: bold; margin-top: 10px;">Built by Mohammad Kasim</p>', 
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    '<p style="text-align: center; color: #888; font-size: 0.9rem;">Enjoy your game!</p>', 
     unsafe_allow_html=True
 )
